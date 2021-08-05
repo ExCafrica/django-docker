@@ -1,0 +1,124 @@
+version: "3.8"
+services: 
+    # redis is an independent service
+    redis: 
+        image: redis:alpine
+        container_name: redis
+
+    # db needs to load first because of app depends_on db
+    db: 
+        image: postgres:13-alpine
+        # volumes: 
+        #     - ./data/db:/var/lib/postgresql/data
+        volumes: 
+            - pgdata:/var/lib/postgresql/data/
+
+        # environment: 
+        #     - POSTGRES_DB=my_postgres_db
+        #     - POSTGRES_USER=my_postgres_user
+        #     - POSTGRES_PASSWORD=my_postgres_password
+        env_file:
+            - ./.dev.env
+        container_name: posgres_db
+        ports: 
+            - "5432:5432"
+        # networks: 
+        #     pga_net:
+        #         ipv4_address: 192.168.0.2
+
+    pgadmin:
+        container_name: pgadmin4
+        image: dpage/pgadmin4
+        # restart: always
+        # environment: 
+        #     PGADMIN_DEFAULT_EMAIL: root@root.com
+        #     PGADMIN_DEFAULT_PASSWORD: root
+        env_file: 
+            - ./.dev.env
+        ports: 
+            - "5050:80"
+        depends_on: 
+            - db
+        # networks: 
+        #     pga_net:
+        #         ipv4_address: 192.168.0.3
+
+    web: 
+        build: .
+        volumes:
+            - .:/code
+        ports:
+            - 8000:8000
+            - 8888:8888
+            - 8889:8889
+        container_name: django_web
+        image: web:django
+        command: start-notebook.sh --NotebookApp.notebook_dir=/code
+        command: sh -c "python manage.py migrate && 
+                        python manage.py wait_for_db &&
+                        python manage.py runserver 0.0.0.0:8000"
+        # environment: 
+        #     - DB_HOST=db
+        #     - DB_NAME=my_postgres_db
+        #     - DB_USER=my_postgres_user
+        #     - DB_PASS=my_postgres_password
+        env_file:
+            - ./.dev.env
+        
+        depends_on: 
+            - db
+            - redis           
+
+    # lab:
+    #     image: jupyter/base-notebook
+    #     volumes:
+    #         - .:/code/
+    #     ports:
+    #         - "8888:8888"
+    #     environment:
+    #         - JUPYTER_ENABLE_LAB=1
+    #     command: start-notebook.sh --NotebookApp.notebook_dir=/code
+    #     depends_on: 
+    #         - web
+    #         - db
+    #         - celery
+# # to start contianers automatically (from docker docs)
+# # 예 on-failure
+    # redis:
+    #     image: redis:alpine
+    #     container_name: redis
+    celery:
+        # it's critical that we try to always
+        #restart the container if there is a problem
+        #  celery is a key service
+        restart: always
+        build: 
+            context: .
+            # -l INFO으로 할 경우에는 정보를 제공함.
+            # 하지만, production에서 꺼도 되는 기능.
+            # 이 때 DEBUG로 변경
+        command: celery -A conf worker -l INFO
+        volumes:
+            - .:/code
+        container_name: celery
+        # environment: 
+        #     - DB_HOST=db
+        #     - DB_NAME=my_postgres_db
+        #     - DB_USER=my_postgres_user
+        #     - DB_PASS=my_postgres_password
+        env_file:
+            - ./.dev.env
+
+        depends_on:
+            - db
+            - redis
+            - web
+# networks:
+#     pga_net:
+#         ipam:
+#             driver: default
+#             config: 
+#                 - subnet: "192.168.0.0/24"
+#                   gateway: 192.168.0.1
+volumes:
+    pgdata:

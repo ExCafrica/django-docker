@@ -1,0 +1,9 @@
+# only for developing
+.env
+.dev.env
+__pycache__/
+.vscode
+.ipynb_checkpoints/
+/venv
+
+# additional for deployment

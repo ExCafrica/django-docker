@@ -1,0 +1,78 @@
+# 시작할 때 필요한 파일
+.dev.env
+.dockerignore
+docker-compose.yml
+Dockerfile
+requirments-dev.txt
+
+##### 명령
+    # web:django 도커이미지 빌드
+        docker-compose build
+        docker images
+        docker ps
+    # web:django 컨테이너 생성하고 들어가보기
+        docker run -it web:django sh
+    
+    # 컴포즈로 가상환경 생성
+        docker-compose run web virtualenv venv
+    # django 프로젝트 생성
+        docker-compose run web sh -c "django-admin startproject locallibrary"
+    # django 셋팅 조정
+        # settings.py
+        import os
+        from dotenv import load_dotenv
+        load_dotenv(os.path.join(BASE_DIR, ".dev.env"))
+        SECRET_KEY = os.environ.get("SECRET_KEY")
+        ...
+        DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'HOST': os.environ.get('DB_HOST'),
+                    'NAME': os.environ.get('DB_NAME'),
+                    'USER': os.environ.get('DB_USER'),
+                    'PASSWORD': os.environ.get('DB_PASS'),
+                    'PORT': os.environ.get('DB_PORT'),        
+                }
+            }
+        ...
+        TIME_ZONE = 'Asia/Seoul'
+        ...
+        CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "")
+        CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "")
+
+        # django core app 생성
+        docker-compose run web sh -c "django-admin startapp core"
+
+        # settings.py에 추가 앱등록
+        INSTALLED_APPS = [
+            ...
+            'core',
+        ]
+        # management 폴더 commands폴더 패키지화하고 
+        # wait_for_db.py 만들기
+
+        # conf/celery.py 만들기
+        # conf/__init__.py 셀러리 실행을 위해 수정하기
+
+        # 이미지 빌드
+        docker-compose build
+        # 컴포즈
+        docker-compose up --build
+
+        # 도커 이미지 스냅샷로컬저장(commit) 및 푸쉬
+            - 컨테이너이미지 스냅샷 로컬 저장:
+                docker commit django_web django_web
+            - 저장된 이미지에 태그달기
+                docker tag django_web cosmosinhand/django_web
+            - 태크달린 이미지 도커허브 저장소에 푸시하기
+                docker login
+                docker push cosmosinhand/django_web
+        
+        # jupyter lab실행하기
+            - jupyter lab --allow-root 
+            - token 정보 카피n페이스트
+            - jupyter server list 로 상태를 알 수 있다.
+            - 호스트의 authentication과 충돌할 수 있으니 
+                vscode터미널에서 Ctrl+클릭으로 진입하는 게 낫다.
+
+
