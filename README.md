@@ -4,7 +4,7 @@
 
 
 # pgAdmin 4
-![pgAdmin 서버연결](./pgAdmin.png)
+- 서버연결입력창![pgAdmin 서버연결](./pics/pgAdmin.png)
 
 # git 작업과정
 1. 한 조직의 owner로부터 **organization**조직에서 하는 **project** 중 하나인 django-docker 프로젝트에 제3자인 내가 **collaborate**협업을  권유받게 되었다.
@@ -52,4 +52,8 @@
 
 2. 우선 로컬 data브랜치로(이미 커밋할 때부터 data브랜치였다.) origin/data브랜치에 push해두자.
     - git push origin data
+![비교n풀req](./pics/compareNpullreq.png)  
+    - compare&pull request단추를 누르면,
+    ![open풀req](./pics/openApullreq.png)
+    - 문제가 없을 경우 owner가 아닌 내가 (member이므로) merge 할 수 있다.![self_merge01](./pics/merge01.png)![self_merge02](./pics/merge02.png)![self_merge03](./pics/merge03.png)
     
