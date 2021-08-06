@@ -75,4 +75,8 @@ requirments-dev.txt
             - 호스트의 authentication과 충돌할 수 있으니 
                 vscode터미널에서 Ctrl+클릭으로 진입하는 게 낫다.
 
+        # 다른 python package를 추가로 설치하는 등의 추가 레이어를 컨테이너에 설치하고 싶을 때
+            - 기존 이미지의 Dockerfile에서 `FROM <baseimage>`의 `<baseimage>`를 이미 만들어진  
+                cosmosinhand/django_web:latest로 하고 추가 설치를 위한 명령을 기록하면 된다. 
+
 

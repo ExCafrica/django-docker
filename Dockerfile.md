@@ -22,7 +22,7 @@ RUN apk add --update --no-cache postgresql-client jpeg-dev
 RUN apk add --update --no-cache --virtual .tmp-build-deps \
     gcc libc-dev linux-headers postgresql-dev musl-dev zlib zlib-dev
 RUN apk add --update --no-cache g++ gcc libxslt-dev
-
+RUN apk add --update --no-cache git
 # 컨테이너의 작업디렉토리 /code/를 만든다.
 WORKDIR /code
 COPY requirements-dev.txt requirements-dev.txt
