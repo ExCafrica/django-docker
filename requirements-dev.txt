@@ -17,6 +17,11 @@ django-celery-beat
 psycopg2
 jupyterlab
 matplotlib
-numpy
 pandas
+
 asyncio
+PyYAML
+uritemplate
+Pygments
+django-guardian
+nltk
